@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative "MyWidgets.rb"
+require_relative "MazeGenerator.rb"
 require 'Qt'
 
 class MazeUI < Qt::Widget
