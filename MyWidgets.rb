@@ -2,18 +2,18 @@ require 'Qt'
 require_relative "MazeGenerator.rb"
 
 class MazeWindow < Qt::Widget
+  attr_accessor :maze
+	def initialize
+		super
 
-	def initialize(width, height)
-		super()
-
-    @scale = 5
-    @height = height
-    @width  = width 
+    @maze = nil
+    @scale = 7
+    height = 80
+    width = 80
 
 		initUI
 
 		setFixedSize(width*@scale,height*@scale)
-    @grid = MazeGenerator.new(1,80,80)
 
 		show
 	end
@@ -31,10 +31,12 @@ class MazeWindow < Qt::Widget
     	update()
     	painter.setRenderHint Qt::Painter::Antialiasing
     	painter.setBrush Qt::Brush.new Qt::Color.new(150,150,150)
-      for i in 0...@grid.grid.length
-        for j in 0..@grid.grid[0].length
-          if @grid.grid[i][j] == "w"
-            painter.drawRect(i*@scale,j*@scale,@scale,@scale)
+      if @maze
+        for i in 0...@maze.length
+          for j in 0..@maze[0].length
+            if @maze[i][j] == "w"
+              painter.drawRect(j*@scale,i*@scale,@scale,@scale)
+            end
           end
         end
       end

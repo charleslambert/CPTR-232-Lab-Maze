@@ -1,3 +1,4 @@
+#!/usr/bin/env ruby
 
 class MazeGenerator
 	attr_accessor :grid
@@ -9,6 +10,7 @@ class MazeGenerator
 		chamberDiv(0,width-1,0,height-1, 3)
 
 		@grid[1][0] = " "
+		toFile("testfile.txt")
 	end
 
 	def edgeWalls(openings, width, height)
@@ -38,9 +40,16 @@ class MazeGenerator
 			#cut an opening into the walls created
 			xran2 = r.rand((x1+1)...x2)
 			yran2 = r.rand((y1+1)...y2)
-			@grid[yran][xran2] = " "
-			@grid[yran2][xran] = " "
-	
+			if xran2 != xran
+				@grid[yran][xran2] = " "
+			else
+				@grid[yran][xran2+1] = " "
+			end
+			if yran != yran2
+				@grid[yran2][xran] = " "
+			else
+				@grid[yran2+1][xran] = " "
+			end
 			chamberDiv(x1,xran,y1,yran,minSize)
 			chamberDiv(x1,xran,yran,y2,minSize)
 			chamberDiv(xran,x2,y1,yran,minSize)
@@ -52,4 +61,12 @@ class MazeGenerator
 		puts @grid.map {|row| row.join("")}
 	end
 
+	def toFile(filename)
+		fp = File.open(filename, "w")
+		fp.puts @grid.map {|row| row.join("")}
+		fp.close
+	end
 end
+
+
+MazeGenerator.new(1,10,10)

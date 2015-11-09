@@ -6,6 +6,7 @@ require 'Qt'
 
 class MazeUI < Qt::Widget
 
+	slots('fileRead()')
 
 	def initialize
 		super
@@ -15,7 +16,6 @@ class MazeUI < Qt::Widget
 		initUI
 		connections
 
-		setFixedSize(720,480)
 		move(300,300)
 
 		show
@@ -33,6 +33,7 @@ class MazeUI < Qt::Widget
 		@cMaze = Qt::PushButton.new("initialize Maze")
 		@rMaze = Qt::PushButton.new("Run Maze")
 		@rrMaze = Qt::PushButton.new("Rerun Maze")
+		@rrMaze.enabled = false
 		@bFS = Qt::PushButton.new("Breadth First Search")
 		@dFS = Qt::PushButton.new("Depth First Search")
 		@bFS.checkable = true
@@ -42,7 +43,7 @@ class MazeUI < Qt::Widget
 			i.addButton(@bFS)
 			i.addButton(@dFS)
 		end
-		@mazeWin = MazeWindow.new(80,80)
+		@mazeWin = MazeWindow.new
 	end
 
 	def layout
@@ -72,5 +73,16 @@ class MazeUI < Qt::Widget
 	end
 
 	def connections
+		connect(@cMaze, SIGNAL('clicked()'), self, SLOT(:fileRead))
+	end
+
+	def fileRead()
+		@maze = []
+		file = File.open("#{@file.text}", 'r')
+
+		file.each_line {|line|
+			@maze << line.chomp.split("")}
+		file.close
+		@mazeWin.maze = @maze
 	end
 end
