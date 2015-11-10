@@ -26,9 +26,10 @@ class MazeUI < Qt::Widget
 	end
 
 	def widgets
-		@file = Qt::LineEdit.new
-		@delay = Qt::LineEdit.new
-		@dLabel = Qt::Label.new("Delay")
+		@file = MyValueBox.new("File = ")
+		@delay = MyValueBox.new("Delay = ")
+		@gMaze = Qt::PushButton.new("Generate Maze")
+		@gTMaze = DropDownMenu.new("Types","Primms","Backtrack","Oldest")
 		@cMaze = Qt::PushButton.new("initialize Maze")
 		@rMaze = Qt::PushButton.new("Run Maze")
 		@rrMaze = Qt::PushButton.new("Rerun Maze")
@@ -47,6 +48,7 @@ class MazeUI < Qt::Widget
 
 	def layout
 		vbox1 = Qt::VBoxLayout.new do |i|
+			i.addWidget(@gMaze)
 			i.addWidget(@file)
 			i.addWidget(@cMaze)
 			i.addWidget(@rMaze)
@@ -54,8 +56,8 @@ class MazeUI < Qt::Widget
 		end
 
 		vbox2 = Qt::VBoxLayout.new do |i|
+			i.addWidget(@gTMaze)
 			i.addWidget(@delay)
-			i.addWidget(@dLabel)
 			i.addWidget(@rrMaze)
 			i.addWidget(@dFS)
 		end
@@ -77,7 +79,7 @@ class MazeUI < Qt::Widget
 
 	def fileRead()
 		@maze = []
-		file = File.open("#{@file.text}", 'r')
+		file = File.open("#{@file.value}", 'r')
 
 		file.each_line {|line|
 			@maze << line.chomp.split("")}

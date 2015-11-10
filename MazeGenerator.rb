@@ -27,4 +27,4 @@ class MazeGenerator
 end
 
 
-MazeGenerator.new.generate(1,40,40,"Oldest")
+MazeGenerator.new.generate(1,40,40,"Primms")
