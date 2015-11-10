@@ -6,8 +6,6 @@ class MazeGenerator
 	attr_accessor :grid
 
 	def initialize(openings, width, height)
-
-		#edgeWalls(openings, width, height)
 		#chamberDiv(0,width-1,0,height-1, 3)
 		
 		#@grid[1][0] = " "
@@ -73,4 +71,4 @@ class MazeGenerator
 end
 
 
-MazeGenerator.new(1,10,10)
+MazeGenerator.new(1,80,80)

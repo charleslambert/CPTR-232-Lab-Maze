@@ -15,7 +15,6 @@ class MazeWindow < Qt::Widget
 
 		setFixedSize(width*@scale,height*@scale)
 
-		show
 	end
 
 	def initUI
