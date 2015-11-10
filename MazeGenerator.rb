@@ -1,20 +1,21 @@
 #!/usr/bin/env ruby
 
+require_relative "GrowingTree.rb"
+
 class MazeGenerator
 	attr_accessor :grid
 
 	def initialize(openings, width, height)
-		@grid = Array.new(height) { Array.new(width) {" "}}
 
-		edgeWalls(openings, width, height)
+		#edgeWalls(openings, width, height)
 		#chamberDiv(0,width-1,0,height-1, 3)
 		
-		@grid[1][0] = " "
-		growingTree(width,height)
+		#@grid[1][0] = " "
+		gen = GrowingTree.new(width,height)
+		@grid = gen.grid
 		
 		toFile("testfile.txt")
 		
-		growingTree(width,height)
 	end
 
 	def edgeWalls(openings, width, height)
@@ -58,10 +59,6 @@ class MazeGenerator
 			chamberDiv(xran,x2,y1,yran,minSize)
 			chamberDiv(xran,x2,yran,y2,minSize)
 		end
-	end
-
-	def growingTree(width,height)
-		x, y = rand(1...width), rand(1...height)
 	end
 
 	def print
