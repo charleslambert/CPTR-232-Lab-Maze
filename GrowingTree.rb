@@ -7,15 +7,16 @@ OPP2	   = {:N => :NE, :S => :SE, :E => :NE, :W => :NW}
 class GrowingTree
 	attr_accessor :grid
 
-	def initialize(width, height)
+	def initialize(width, height, type)
 		#create grid of unvisited cells
 		@grid = Array.new(height) {Array.new(width) {"?"}}
+		@type = type
 
-		run(width, height)
+		run(width, height, type)
 		setWall(width, height)
 	end
 
-	def run(width, height)
+	def run(width, height, type)
 		#add first cell to active set
 		x, y = rand(1...width-1), rand(1...height-1)
 		cells = []
@@ -24,7 +25,7 @@ class GrowingTree
 
 		until cells.empty?
 			#select
-			index = 0#cells.length-1#rand(cells.length)
+			index = mode(@type, cells)
  			x, y = cells[index]
 
  			#check neighbors
@@ -43,6 +44,20 @@ class GrowingTree
  			#If cell has no neighbors remove the cell from the active set
  			cells.delete_at(index) if index
  		end
+	end
+
+	def mode(type, cells)
+		selection = nil
+		case type
+			when /Primms/
+				selection = rand(cells.length)
+			when /Backtrack/
+				selection = cells.length-1
+			when /Oldest/
+				selection = 0
+		end
+
+		return selection
 	end
 
 	def check(dir, x, y)

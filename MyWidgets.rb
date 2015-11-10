@@ -1,5 +1,5 @@
 require 'Qt'
-require_relative "MazeGenerator.rb"
+#require_relative "MazeGenerator.rb"
 
 class MazeWindow < Qt::Widget
   attr_accessor :maze
