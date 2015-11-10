@@ -24,14 +24,14 @@ class GrowingTree
 
 		until cells.empty?
 			#select
-			index = rand(cells.length)
+			index = 0#cells.length-1#rand(cells.length)
  			x, y = cells[index]
 
  			#check neighbors
  			[:N,:S,:E,:W].shuffle.each do |dir|
  				dx, dy = x+DX[dir], y+DY[dir]
 
- 				if dx > 0 && dx < width-1 && dy > 0 && dy < height-1 && @grid[dy][dx] == "?" && check(dir, dx, dy)
+ 				if dx.between?(1,width-2) && dy.between?(1,height-2) && @grid[dy][dx] == "?" && check(dir, dx, dy)
  					#if neighbor is not visited add to active set
  					@grid[y][x] = " "
  					@grid[dy][dx] = " "
