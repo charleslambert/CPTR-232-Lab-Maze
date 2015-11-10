@@ -7,10 +7,14 @@ class MazeGenerator
 		@grid = Array.new(height) { Array.new(width) {" "}}
 
 		edgeWalls(openings, width, height)
-		chamberDiv(0,width-1,0,height-1, 3)
-
+		#chamberDiv(0,width-1,0,height-1, 3)
+		
 		@grid[1][0] = " "
+		growingTree(width,height)
+		
 		toFile("testfile.txt")
+		
+		growingTree(width,height)
 	end
 
 	def edgeWalls(openings, width, height)
@@ -26,10 +30,9 @@ class MazeGenerator
 
 	def chamberDiv(x1,x2,y1,y2,minSize)
 		if ((x2-x1) > minSize) and ((y2-y1) > minSize)
-			#cut the chamber into two subchambers
-			r =Random.new
-			xran = r.rand((x1+1)...x2)
-			yran = r.rand((y1+1)...y2)
+			#cut the chamber into four subchambers
+			xran = rand((x1+1)...x2)
+			yran = rand((y1+1)...y2)
 			for i in y1..y2
 				@grid[i][xran] = "w"
 			end
@@ -38,8 +41,8 @@ class MazeGenerator
 			end
 	
 			#cut an opening into the walls created
-			xran2 = r.rand((x1+1)...x2)
-			yran2 = r.rand((y1+1)...y2)
+			xran2 = rand((x1+1)...x2)
+			yran2 = rand((y1+1)...y2)
 			if xran2 != xran
 				@grid[yran][xran2] = " "
 			else
@@ -55,6 +58,10 @@ class MazeGenerator
 			chamberDiv(xran,x2,y1,yran,minSize)
 			chamberDiv(xran,x2,yran,y2,minSize)
 		end
+	end
+
+	def growingTree(width,height)
+		x, y = rand(1...width), rand(1...height)
 	end
 
 	def print
