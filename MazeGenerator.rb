@@ -3,7 +3,6 @@
 require_relative "GrowingTree.rb"
 
 class MazeGenerator
-	attr_accessor :grid
 
 	def initialize
 		@grid = nil
@@ -11,8 +10,6 @@ class MazeGenerator
 
 	def generate(openings, width, height, type)
 		@grid = GrowingTree.new(width, height, type)
-		toFile("testfile.txt")
-
 	end
 
 	def Myprint
@@ -24,7 +21,8 @@ class MazeGenerator
 		fp.puts @grid.grid.map {|row| row.join("")}
 		fp.close
 	end
+
+	def grid
+		return @grid.grid
+	end
 end
-
-
-MazeGenerator.new.generate(1,40,40,"Primms")

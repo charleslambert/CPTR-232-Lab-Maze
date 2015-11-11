@@ -74,7 +74,7 @@ class DropDownMenu < Qt::Widget
     button = Qt::PushButton.new("#{buttonName}",self)
     menu = Qt::Menu.new(self)
     actions.each do |action|
-      menu.addAction("#{action}")
+      menu.addAction(action)
     end
     button.menu = menu
   end
