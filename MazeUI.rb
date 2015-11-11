@@ -28,11 +28,9 @@ class MazeUI < Qt::Widget
 	end
 
 	def widgets
-		@file = MyValueBox.new("File:")
-		@delay = MyValueBox.new("Delay:")
+		#Maze generation buttons and text boxes
 		@wGen = MyValueBox.new("Width:")
 		@hGen = MyValueBox.new("Height:")
-		@export = Qt::PushButton.new("Export")
 		@dropDownButton = Qt::PushButton.new("Type",self)
 		@primms = Qt::Action.new("Primms", @dropDownButton)
 		@backTrack = Qt::Action.new("Backtrack",@dropDownButton)
@@ -43,10 +41,19 @@ class MazeUI < Qt::Widget
     		i.addAction(@oldest)
     	end
     	@dropDownButton.menu = @menu
+
+    	#file import and export buttons and text box
+		@file = MyValueBox.new("File:")
 		@import = Qt::PushButton.new("Import")
+		@export = Qt::PushButton.new("Export")
+
+		#Maze running buttons
+		@delay = MyValueBox.new("Delay:")
 		@rMaze = Qt::PushButton.new("Run Maze")
 		@rrMaze = Qt::PushButton.new("Rerun Maze")
 		@rrMaze.enabled = false
+		
+		#BFS DFS buttons
 		@bFS = Qt::PushButton.new("Breadth First Search")
 		@dFS = Qt::PushButton.new("Depth First Search")
 		@bFS.checkable = true
@@ -132,7 +139,7 @@ class MazeUI < Qt::Widget
 	def fileRead()
 		if @file.value != ""
 			@maze = []
-			file = File.open("#{@import.value}", 'r')
+			file = File.open("#{@file.value}", 'r')
 			file.each_line {|line|
 				@maze << line.chomp.split("")}
 			file.close
