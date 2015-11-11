@@ -2,11 +2,12 @@
 
 require_relative "MyWidgets.rb"
 require_relative "MazeGenerator.rb"
+require_relative "Searches.rb"
 require 'Qt'
 
 class MazeUI < Qt::Widget
 
-	slots('fileRead()','primms()','backtrack()','oldest()','writeFile()')
+	slots('fileRead()','primms()','backtrack()','oldest()','writeFile()', 'solve()')
 
 	def initialize
 		super
@@ -25,6 +26,7 @@ class MazeUI < Qt::Widget
 		widgets
 		layout
 		@generator = MazeGenerator.new
+		@solver = Solver.new(@mazeWin)
 	end
 
 	def widgets
@@ -108,7 +110,30 @@ class MazeUI < Qt::Widget
 		connect(@primms, SIGNAL('triggered()'), self, SLOT(:primms))
 		connect(@oldest, SIGNAL('triggered()'), self, SLOT(:oldest))
 		connect(@backTrack, SIGNAL('triggered()'), self, SLOT(:backtrack))
+		connect(@rMaze, SIGNAL('clicked()'), self, SLOT(:solve))
 	end
+
+	def time
+		@mazeWin.repaint().call
+		sleep(0.02)
+	end
+
+	def solve()
+		#find the entrance
+		for i in 1...@maze[0].length
+			if @maze[0][i] == " "
+				startx, starty = i, 0
+				break
+			end
+		end
+
+		if @bFS.checked == true
+			@solver.bFS(@maze, startx, starty,@delay.value.to_f)
+		else
+			@solver.dFS(@maze, startx, starty,@delay.value.to_f)
+		end
+	end
+
 
 	def generate(x, y, type)
 		if not (x <= 4) and not (y <= 4)
@@ -119,8 +144,8 @@ class MazeUI < Qt::Widget
 				y = 80
 			end
 			@generator.generate(x, y, type)
-			maze = @generator.grid
-			@mazeWin.maze = maze
+			@maze = @generator.grid
+			@mazeWin.maze = @maze
 		end
 	end
 

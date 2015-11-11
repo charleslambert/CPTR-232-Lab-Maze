@@ -29,11 +29,18 @@ class MazeWindow < Qt::Widget
     def drawShapes(painter)
     	update()
     	painter.setRenderHint Qt::Painter::Antialiasing
-    	painter.setBrush Qt::Brush.new Qt::Color.new(150,150,150)
       if @maze
         for i in 0...@maze.length
           for j in 0..@maze[0].length
-            if @maze[i][j] == "w"
+            case @maze[i][j]
+            when "w"
+              painter.setBrush Qt::Brush.new Qt::Color.new(150,150,150)
+              painter.drawRect(j*@scale,i*@scale,@scale,@scale)
+            when "g"
+              painter.setBrush Qt::Brush.new Qt::Color.new(0,150,0)
+              painter.drawRect(j*@scale,i*@scale,@scale,@scale)
+            when "b"
+              painter.setBrush Qt::Brush.new Qt::Color.new(0,0,150)
               painter.drawRect(j*@scale,i*@scale,@scale,@scale)
             end
           end
@@ -64,18 +71,5 @@ class MyValueBox < Qt::Widget
       set = set.first
       @box.text = set
     end
-  end
-end
-
-class DropDownMenu < Qt::Widget
-  def initialize(buttonName, *actions)
-    super()
-
-    button = Qt::PushButton.new("#{buttonName}",self)
-    menu = Qt::Menu.new(self)
-    actions.each do |action|
-      menu.addAction(action)
-    end
-    button.menu = menu
   end
 end
