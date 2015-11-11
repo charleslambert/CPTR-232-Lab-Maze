@@ -103,26 +103,30 @@ class MazeUI < Qt::Widget
 		connect(@backTrack, SIGNAL('triggered()'), self, SLOT(:backtrack))
 	end
 
-	def generate(open, x, y, type)
-		if x != 0 && y != 0
-			puts [x,y]
-			@generator.generate(1, x, y, type)
+	def generate(x, y, type)
+		if not (x <= 4) and not (y <= 4)
+			if x > 80 
+				x = 80
+			end
+			if y > 80
+				y = 80
+			end
+			@generator.generate(x, y, type)
 			maze = @generator.grid
 			@mazeWin.maze = maze
-			@mazeWin.repaint()
 		end
 	end
 
 	def primms()
-		generate(1, @wGen.value.to_i, @hGen.value.to_i, "Primms")
+		generate(@wGen.value.to_i, @hGen.value.to_i, "Primms")
 	end
 
 	def oldest()
-		generate(1, @wGen.value.to_i, @hGen.value.to_i, "Oldest")
+		generate(@wGen.value.to_i, @hGen.value.to_i, "Oldest")
 	end
 
 	def backtrack()
-		generate(1, @wGen.value.to_i, @hGen.value.to_i, "Backtrack")
+		generate(@wGen.value.to_i, @hGen.value.to_i, "Backtrack")
 	end
 
 	def fileRead()
