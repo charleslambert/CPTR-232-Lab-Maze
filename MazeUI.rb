@@ -128,12 +128,16 @@ class MazeUI < Qt::Widget
 		end
 
 		if @bFS.checked == true
-			@solver.bFS(@maze, startx, starty,@delay.value.to_f)
+			@solver.bFS(@maze, startx, starty,@delay.value.to_f) {delay(@delay.value.to_f)}
 		else
-			@solver.dFS(@maze, startx, starty,@delay.value.to_f)
+			@solver.dFS(@maze, startx, starty,@delay.value.to_f) {delay(@delay.value.to_f)}
 		end
 	end
 
+	def delay(time)
+		@mazeWin.repaint()
+		sleep(time)
+	end
 
 	def generate(x, y, type)
 		if not (x <= 4) and not (y <= 4)

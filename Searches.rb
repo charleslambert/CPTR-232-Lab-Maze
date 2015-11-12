@@ -24,7 +24,7 @@ class Solver
 		q = []
 
 		q.push(s)
-		delay(time)
+		yield
 		#iterate through queue
 		until q.empty?
 			#dequeue u
@@ -39,7 +39,7 @@ class Solver
 					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
 					g[v[:posy]][v[:posx]] = "g"
 					q.push(v)
-					delay(time)
+					yield
 				end
 			end
 			# u color set to Black
@@ -60,7 +60,7 @@ class Solver
 		#enqueue s
 		q = Queue.new
 		q.enqueue(s)
-		delay(time)
+		yield
 		#iterate through queue
 		until q.empty
 			#dequeue u
@@ -75,7 +75,7 @@ class Solver
 					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
 					g[v[:posy]][v[:posx]] = "g"
 					q.enqueue(v)
-					delay(time)
+					yield
 				end
 			end
 			# u color set to Black
@@ -90,13 +90,6 @@ class Solver
 	
 	def clearGraph(g)
 		g.map! {|row| row.map! {|elem| if elem != "w" then elem = " " else elem = "w" end}}
-	end
-	
-	def delay(time)
-		if time
-			@disWindow.repaint()
-			sleep(time)
-		end
 	end
 end
 
