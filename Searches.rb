@@ -9,26 +9,22 @@ class Solver
 		@disWindow = disWindow
 	end
 
+	def solve
+	end
+
 	def dFS(g, sx, sy, time)
 		#clear the Setup G
 		#all vertexs set to white
-		g.map! {|row| row.map! {|elem| if elem != "w" then elem = " " else elem = "w" end}}
+		clearGraph(g)
 
 		#set begining vertex s
-		s = Node.new
-		s[:posx] = sx
-		s[:posy] = sy
+		s = Node.new(sx, sy, 0, nil)
 		g[s[:posy]][s[:posx]] = "g"
-		s[:dist] = 0
-		s[:parent] = nil
 		#enqueue s
 		q = []
 
 		q.push(s)
-		if time
-			@disWindow.repaint()
-			sleep(time)
-		end
+		delay(time)
 		#iterate through queue
 		until q.empty?
 			#dequeue u
@@ -39,46 +35,32 @@ class Solver
 				y = dir[1]
 				#and if not visted set to gray
 				#enquege v
-				if checkPos(u[:posx],u[:posy], x, y,g) && g[y+u[:posy]][x+u[:posx]] == " "
-					v = Node.new
-					v[:posx] = x+u[:posx]
-					v[:posy] = y+u[:posy]
+				if checkPos(u[:posx], u[:posy], x, y, g)
+					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
 					g[v[:posy]][v[:posx]] = "g"
-					v[:dist] = u[:dist] + 1
-					v[:parent] = u
 					q.push(v)
-					if time
-						@disWindow.repaint()
-						sleep(time)
-					end
+					delay(time)
 				end
 			end
 			# u color set to Black
 			g[u[:posy]][u[:posx]] = "b"
 		end
-		
+		return u
 	end
 
+	
 	def bFS(g, sx, sy, time)
 		#clear the Setup G
 		#all vertexs set to white
-		g.map! {|row| row.map! {|elem| if elem != "w" then elem = " " else elem = "w" end}}
+		clearGraph(g)
 
 		#set begining vertex s
-		s = Node.new
-		s[:posx] = sx
-		s[:posy] = sy
+		s = Node.new(sx, sy, 0, nil)
 		g[s[:posy]][s[:posx]] = "g"
-		s[:dist] = 0
-		s[:parent] = nil
 		#enqueue s
 		q = Queue.new
-
 		q.enqueue(s)
-		if time
-			@disWindow.repaint()
-			sleep(time)
-		end
+		delay(time)
 		#iterate through queue
 		until q.empty
 			#dequeue u
@@ -89,32 +71,34 @@ class Solver
 				y = dir[1]
 				#and if not visted set to gray
 				#enquege v
-				if checkPos(u[:posx],u[:posy], x, y,g) && g[y+u[:posy]][x+u[:posx]] == " "
-					v = Node.new
-					v[:posx] = x+u[:posx]
-					v[:posy] = y+u[:posy]
+				if checkPos(u[:posx], u[:posy], x, y, g)
+					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
 					g[v[:posy]][v[:posx]] = "g"
-					v[:dist] = u[:dist] + 1
-					v[:parent] = u
 					q.enqueue(v)
-					if time
-						@disWindow.repaint()
-						sleep(time)
-					end
+					delay(time)
 				end
 			end
 			# u color set to Black
 			g[u[:posy]][u[:posx]] = "b"
 		end
+		return u
 	end
 
-	def checkPos(x, y, dx, dy,g)
-		(y+dy).between?(0,(g.length-1)) && (x+dx).between?(1,(g[0].length-1))
+	def checkPos(x, y, dx, dy, g)
+		(y+dy).between?(0,(g.length-1)) && (x+dx).between?(1,(g[0].length-1)) && g[dy+y][dx+x] == " "
+	end
+	
+	def clearGraph(g)
+		g.map! {|row| row.map! {|elem| if elem != "w" then elem = " " else elem = "w" end}}
+	end
+	
+	def delay(time)
+		if time
+			@disWindow.repaint()
+			sleep(time)
+		end
 	end
 end
-
-
-
 
 class Queue
 	def initialize

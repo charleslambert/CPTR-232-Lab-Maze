@@ -121,7 +121,7 @@ class MazeUI < Qt::Widget
 	def solve()
 		#find the entrance
 		for i in 1...@maze[0].length
-			if @maze[0][i] == " "
+			if @maze[0][i] == " " or @maze[0][i] == "b"
 				startx, starty = i, 0
 				break
 			end
