@@ -26,7 +26,7 @@ class MazeUI < Qt::Widget
 		widgets
 		layout
 		@generator = MazeGenerator.new
-		@solver = Solver.new(@mazeWin)
+		@solver = Solver.new
 	end
 
 	def widgets
@@ -113,24 +113,19 @@ class MazeUI < Qt::Widget
 		connect(@rMaze, SIGNAL('clicked()'), self, SLOT(:solve))
 	end
 
-	def time
-		@mazeWin.repaint().call
-		sleep(0.02)
-	end
-
 	def solve()
 		#find the entrance
 		for i in 1...@maze[0].length
 			if @maze[0][i] == " " or @maze[0][i] == "b"
-				startx, starty = i, 0
+				s = :"#{i},#{0}"
 				break
 			end
 		end
 
 		if @bFS.checked == true
-			@solver.bFS(@maze, startx, starty,@delay.value.to_f) {delay(@delay.value.to_f)}
+			@solver.bFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
 		else
-			@solver.dFS(@maze, startx, starty,@delay.value.to_f) {delay(@delay.value.to_f)}
+			@solver.dFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
 		end
 	end
 

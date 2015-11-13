@@ -5,24 +5,31 @@ E = [1,0]
 W = [-1,0]
 
 class Solver
-	def initialize(disWindow)
-		@disWindow = disWindow
+
+	def nodeMap(mArray)
+		nMap = Hash.new
+
+		for y in (0...mArray.length)
+			for x in (0...mArray.first.length)
+				if mArray[y][x] == " "
+					nMap["#{x},#{y}".to_sym] = Node.new(x, y, 0, nil)
+				end
+			end
+		end
+
+		return nMap
 	end
 
-	def solve
-	end
-
-	def dFS(g, sx, sy, time)
+	def dFS(g, m, s)
 		#clear the Setup G
 		#all vertexs set to white
 		clearGraph(g)
 
 		#set begining vertex s
-		s = Node.new(sx, sy, 0, nil)
-		g[s[:posy]][s[:posx]] = "g"
+		s = m[s]
+		g[s.posy][s.posx] = "g"
 		#enqueue s
 		q = []
-
 		q.push(s)
 		yield
 		#iterate through queue
@@ -35,28 +42,29 @@ class Solver
 				y = dir[1]
 				#and if not visted set to gray
 				#enquege v
-				if checkPos(u[:posx], u[:posy], x, y, g)
-					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
-					g[v[:posy]][v[:posx]] = "g"
+				if checkPos(u.posx, u.posy, x, y, g)
+					v = m["#{x+u.posx},#{y+u.posy}".to_sym]
+					v.dist = u.dist + 1
+					v.parent = u
+					g[v.posy][v.posx] = "g"
 					q.push(v)
 					yield
 				end
 			end
 			# u color set to Black
-			g[u[:posy]][u[:posx]] = "b"
+			g[u.posy][u.posx] = "b"
 		end
 		return u
 	end
 
 	
-	def bFS(g, sx, sy, time)
+	def bFS(g, m, s)
 		#clear the Setup G
 		#all vertexs set to white
 		clearGraph(g)
-
 		#set begining vertex s
-		s = Node.new(sx, sy, 0, nil)
-		g[s[:posy]][s[:posx]] = "g"
+		s = m[s]
+		g[s.posy][s.posx] = "g"
 		#enqueue s
 		q = Queue.new
 		q.enqueue(s)
@@ -71,15 +79,17 @@ class Solver
 				y = dir[1]
 				#and if not visted set to gray
 				#enquege v
-				if checkPos(u[:posx], u[:posy], x, y, g)
-					v = Node.new(x+u[:posx], y+u[:posy], u[:dist] + 1, u)
-					g[v[:posy]][v[:posx]] = "g"
+				if checkPos(u.posx, u.posy, x, y, g)
+					v = m["#{x+u.posx},#{y+u.posy}".to_sym]
+					v.dist = u.dist. + 1
+					v.parent = u
+					g[v.posy][v.posx] = "g"
 					q.enqueue(v)
 					yield
 				end
 			end
 			# u color set to Black
-			g[u[:posy]][u[:posx]] = "b"
+			g[u.posy][u.posx] = "b"
 		end
 		return u
 	end
