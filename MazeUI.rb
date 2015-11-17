@@ -3,6 +3,7 @@
 require_relative "MyWidgets.rb"
 require_relative "MazeGenerator.rb"
 require_relative "Searches.rb"
+require_relative "Graph.rb"
 require 'Qt'
 
 class MazeUI < Qt::Widget
@@ -115,18 +116,25 @@ class MazeUI < Qt::Widget
 
 	def solve()
 		#find the entrance
-		for i in 1...@maze[0].length
-			if @maze[0][i] == " " or @maze[0][i] == "b"
-				s = :"#{i},#{0}"
-				break
-			end
-		end
+		@graph = Graph.new(@maze)
+		puts @graph
+		p @graph.vertexs.keys
+		p @graph.vertexs.values
+		p @graph.edges.keys
+		p @graph.edges.values
 
-		if @bFS.checked == true
-			@solver.bFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
-		else
-			@solver.dFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
-		end
+		#for i in 1...@maze[0].length
+		#	if @maze[0][i] == " " or @maze[0][i] == "b"
+		#		s = :"#{i},#{0}"
+		#		break
+		#	end
+		#end
+#
+		#if @bFS.checked == true
+		#	@solver.bFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
+		#else
+		#	@solver.dFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
+		#end
 	end
 
 	def delay(time)

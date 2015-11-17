@@ -34,13 +34,16 @@ class MazeWindow < Qt::Widget
           for j in 0..@maze[0].length
             case @maze[i][j]
             when "w"
-              painter.setBrush Qt::Brush.new Qt::Color.new(150,150,150)
+              painter.setBrush Qt::Brush.new(Qt::black)
               painter.drawRect(j*@scale,i*@scale,@scale,@scale)
             when "g"
-              painter.setBrush Qt::Brush.new Qt::Color.new(0,150,0)
+              painter.setBrush Qt::Brush.new(Qt::green)
               painter.drawRect(j*@scale,i*@scale,@scale,@scale)
             when "b"
-              painter.setBrush Qt::Brush.new Qt::Color.new(0,0,150)
+              painter.setBrush Qt::Brush.new(Qt::blue)
+              painter.drawRect(j*@scale,i*@scale,@scale,@scale)
+            when "G"
+              painter.setBrush Qt::Brush.new(Qt::gray)
               painter.drawRect(j*@scale,i*@scale,@scale,@scale)
             end
           end

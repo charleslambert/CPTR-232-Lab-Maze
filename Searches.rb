@@ -1,4 +1,5 @@
 Node = Struct.new(:posx, :posy, :dist, :parent)
+
 N = [0,1]
 S = [0,-1]
 E = [1,0]
@@ -12,7 +13,7 @@ class Solver
 		for y in (0...mArray.length)
 			for x in (0...mArray.first.length)
 				if mArray[y][x] == " "
-					nMap["#{x},#{y}".to_sym] = Node.new(x, y, 0, nil)
+					nMap['#{x},#{y}'.to_sym] = Node.new(x, y, 0, nil)
 				end
 			end
 		end
@@ -80,18 +81,74 @@ class Solver
 				#and if not visted set to gray
 				#enquege v
 				if checkPos(u.posx, u.posy, x, y, g)
-					v = m["#{x+u.posx},#{y+u.posy}".to_sym]
-					v.dist = u.dist. + 1
-					v.parent = u
-					g[v.posy][v.posx] = "g"
+					v = setV(g,m,u,x,y)
 					q.enqueue(v)
 					yield
 				end
 			end
 			# u color set to Black
 			g[u.posy][u.posx] = "b"
+			checkEndPath(g, u)
 		end
 		return u
+	end
+
+	def dacPath(g,node)
+		while (not checkActiveChild(g, node))
+			g[node.posy][node.posx] == "G"
+			node = node.parent
+		end
+	end
+
+	def checkEndPath(g,node)
+		if node.posy == g.length-1
+			return node
+		elsif checkSurround(g,node)
+			puts 6
+			dacPath(g,node)
+		end
+	end
+
+	def checkSurround(g,node)
+		t = 0
+		[S,E,W,N].each do |dir|
+			x = dir[0]
+			y = dir[1]
+			if g[y+node.posy][x+node.posx] == "w"
+				t += 1
+			end
+		end
+		if t == 3
+			puts t
+			return true
+		else 
+			return false
+		end
+	end
+
+	def checkActiveChild(g, node)
+		t = 0
+		[S,E,W,N].each do |dir|
+			x = dir[0]
+			y = dir[1]
+			puts node
+			if g[y+node.posy][x+node.posx] == "b"
+				t += 1
+			end
+		end
+		if t > 0
+			return true
+		else 
+			return false
+		end
+	end
+
+	def setV(g,m,u,x,y)
+		v = m["#{x+u.posx},#{y+u.posy}".to_sym]
+		v.dist = u.dist. + 1
+		v.parent = u
+		g[v.posy][v.posx] = "g"
+		return v
 	end
 
 	def checkPos(x, y, dx, dy, g)
