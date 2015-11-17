@@ -8,7 +8,7 @@ require 'Qt'
 
 class MazeUI < Qt::Widget
 
-	slots('fileRead()','primms()','backtrack()','oldest()','writeFile()', 'solve()')
+	slots('fileRead()','primms()','backtrack()','oldest()','writeFile()', 'solve()','onTimeout()', 'updateDelay()')
 
 	def initialize
 		super
@@ -28,6 +28,7 @@ class MazeUI < Qt::Widget
 		layout
 		@generator = MazeGenerator.new
 		@solver = Solver.new
+		@timer = Qt::Timer.new
 	end
 
 	def widgets
@@ -51,7 +52,12 @@ class MazeUI < Qt::Widget
 		@export = Qt::PushButton.new("Export")
 
 		#Maze running buttons
-		@delay = MyValueBox.new("Delay:")
+		@delayLabel = Qt::Label.new("Delay:")
+		@dSlider = Qt::Slider.new(Qt::Horizontal) do |i|
+			i.setRange(0,100)
+			i.setValue(0)
+		end
+		@dDelay = Qt::LCDNumber.new(3)
 		@rMaze = Qt::PushButton.new("Run Maze")
 		@rrMaze = Qt::PushButton.new("Rerun Maze")
 		@rrMaze.enabled = false
@@ -83,10 +89,16 @@ class MazeUI < Qt::Widget
 			i.addWidget(@file)
 		end
 
+		mDelay = Qt::HBoxLayout.new do |i|
+			i.addWidget(@delayLabel)
+			i.addWidget(@dSlider)
+			i.addWidget(@dDelay)
+		end
+
 		runMaze = Qt::HBoxLayout.new do |i|
 			i.addWidget(@rMaze)
 			i.addWidget(@rrMaze)
-			i.addWidget(@delay)
+			i.addLayout(mDelay)
 		end
 
 		searchMode = Qt::HBoxLayout.new do |i|
@@ -112,6 +124,9 @@ class MazeUI < Qt::Widget
 		connect(@oldest, SIGNAL('triggered()'), self, SLOT(:oldest))
 		connect(@backTrack, SIGNAL('triggered()'), self, SLOT(:backtrack))
 		connect(@rMaze, SIGNAL('clicked()'), self, SLOT(:solve))
+		connect(@timer, SIGNAL('timeout()'), self, SLOT(:onTimeout))
+		connect(@dSlider, SIGNAL('valueChanged(int)'), self, SLOT(:updateDelay))
+		connect(@dSlider, SIGNAL('valueChanged(int)'), @dDelay, SLOT('display(int)'))
 	end
 
 	def solve()
@@ -125,19 +140,39 @@ class MazeUI < Qt::Widget
 			end
 		end
 
-		if @bFS.checked == true
-			@solver.bFS(@graph, s) {|graph| delay(@delay.value.to_f, graph)}
-		else
-			@solver.dFS(@graph, s) {|graph| delay(@delay.value.to_f, graph)}
-		end
+		@searchTime = Fiber.new {
+			if @bFS.checked == true
+				@solver.bFS(@graph, s) {|graph| 
+					updateWin(@graph)
+					Fiber.yield
+				}
+			else
+				@solver.dFS(@graph, s) {|graph| 
+					updateWin(@graph)
+					Fiber.yield
+				}
+			end
+		}
+		@timer.start
 	end
 
-	def delay(time, graph)
+	def updateWin(graph)
 		graph.vertexs.values.each do |node|
 		 	@maze[node.posy][node.posx] = node.color
 		end
 		@mazeWin.repaint()
-		sleep(time)
+	end
+
+	def onTimeout
+		begin
+		@searchTime.resume  
+		rescue FiberError
+			@timer.stop
+		end
+	end
+
+	def updateDelay
+		@timer.interval = @dSlider.value
 	end
 
 	def generate(x, y, type)
