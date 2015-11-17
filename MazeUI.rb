@@ -131,7 +131,13 @@ class MazeUI < Qt::Widget
 
 	def solve()
 		#find the entrance
-		@graph = Graph.new(@maze)
+		for y in 0...@maze.length
+			for x in 0...@maze[0].length
+				if @maze[y][x] != "w"
+					@maze[y][x] = " "
+				end
+			end
+		end
 
 		for i in 1...@maze[0].length
 			if @maze[0][i] == " " or @maze[0][i] == "b"
@@ -186,6 +192,7 @@ class MazeUI < Qt::Widget
 			@generator.generate(x, y, type)
 			@maze = @generator.grid
 			@mazeWin.maze = @maze
+			@graph = Graph.new(@maze)
 		end
 	end
 
@@ -209,6 +216,7 @@ class MazeUI < Qt::Widget
 				@maze << line.chomp.split("")}
 			file.close
 			@mazeWin.maze = @maze
+			@graph = Graph.new(@maze)
 		end
 	end
 

@@ -1,4 +1,3 @@
-SGraph = Struct.new(:vertexs,:edges, :maze)
 Node = Struct.new(:posx, :posy, :dist, :color, :parent)
 
 N = [0,1]
@@ -9,13 +8,12 @@ W = [-1,0]
 class Graph
 	attr_reader :vertexs, :edges, :maze
 	def initialize(maze)
-		@graph = SGraph.new(makeVertexs(maze),makeEdges(maze), maze)
-		@vertexs = @graph.vertexs
-		@edges = @graph.edges
+		@vertexs = self.class.makeVertexs(maze)
+		@edges = self.class.makeEdges(maze)
 		@maze = maze
 	end
 
-	def makeVertexs(maze)
+	def self.makeVertexs(maze)
 		vertexs = {}
 		for y in (0...maze.length)
 			for x in (0...maze[0].length)
@@ -27,7 +25,7 @@ class Graph
 		return vertexs
 	end
 
-	def makeEdges(maze)
+	def self.makeEdges(maze)
 		edges = {}
 		for y in (0...maze.length)
 			for x in (0...maze[0].length)
@@ -52,7 +50,9 @@ class Graph
 		return edges
 	end
 
-	def checkPos(x, y, dx, dy, maze)
-		(y+dy).between?(0,(maze.length-1)) && (x+dx).between?(1,(maze[0].length-1)) && maze[dy+y][dx+x] == " " && maze[y][x] == " "
+	def self.checkPos(x, y, dx, dy, maze)
+		(y+dy).between?(0,(maze.length-1)) && 
+		(x+dx).between?(1,(maze[0].length-1)) && 
+		maze[dy+y][dx+x] == " " && maze[y][x] == " "
 	end
 end

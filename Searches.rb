@@ -2,13 +2,13 @@ class Solver
 
 	def dFS(g, s)
 
-		#set begining vertex s
+		clearGraph(g)
+
 		s.color = "g"
-		#enqueue s
 		q = []
 		q.push(s)
 		yield g
-		#iterate through queue
+
 		until q.empty?
 			#dequeue u
 			u = q.pop
@@ -18,30 +18,25 @@ class Solver
 				y = dir[1]
 				#and if not visted set to gray
 				#enquege v
-				if g.edges["#{u.posx},#{u.posy}".to_sym].include?([x+u.posx,y+u.posy]) && g.vertexs["#{x+u.posx},#{y+u.posy}".to_sym].color == " "
-					v = g.vertexs["#{x+u.posx},#{y+u.posy}".to_sym]
-					v.dist = u.dist + 1
-					v.parent = u
-					v.color = "g"
-					q.push(v)
+				if checkVisit(u.posx,u.posy,x,y,g)
+					visist(x,y,u,g) {|v| q.push(v)}
 					yield g
 				end
 			end
-			# u color set to Black
+			# u color set to Blue
 			u.color = "b"
 			nowEnd = checkEnd(g, u, q)
 			yield g
 
-			if nowEnd
-				break
-			end
+			break if nowEnd
 		end
 	end
 
 	def bFS(g, s)
-		#set begining vertex s
+		
+		clearGraph(g)
+
 		s.color = "g"
-		#enqueue s
 		q = Queue.new
 		q.enqueue(s)
 		yield g
@@ -50,53 +45,65 @@ class Solver
 			#dequeue u
 			u = q.dequeue
 			#check vertices around u
-			[S,E,W,N].each do |dir|
+			[S,E,W,N].shuffle.each do |dir|
 				x = dir[0]
 				y = dir[1]
-				#and if not visted set to gray
-				#enquege v
-				if g.edges["#{u.posx},#{u.posy}".to_sym].include?([x+u.posx,y+u.posy]) && g.vertexs["#{x+u.posx},#{y+u.posy}".to_sym].color == " "
-					v = g.vertexs["#{x+u.posx},#{y+u.posy}".to_sym]
-					v.dist = u.dist + 1
-					v.parent = u
-					v.color = "g"
-					q.enqueue(v)
+		
+				if checkVisit(u.posx,u.posy,x,y,g)
+					visist(x,y,u,g) {|v| q.enqueue(v)}
 					yield g
 				end
 			end
-			# u color set to Blue
+			
 			u.color = "b"
 			nowEnd = checkEnd(g, u, q.que)
 			yield g
 
-			if nowEnd
-				break
-			end
+			break if nowEnd
 		end
+	end
+
+	def clearGraph(g)
+		g.vertexs.values.each do |v|
+			v.color = " "
+		end
+	end
+
+	def visist(dx,dy,u,g)
+		v = g.vertexs["#{dx+u.posx},#{dy+u.posy}".to_sym]
+		v.dist = u.dist + 1
+		v.parent = u
+		v.color = "g"
+		yield v
+	end		
+
+
+	def checkVisit(x,y,dx,dy,g)
+		return g.edges["#{x},#{y}".to_sym].include?([dx+x,dy+y]) && g.vertexs["#{dx+x},#{dy+y}".to_sym].color == " "
 	end
 
 	def checkEnd(g, node, q)
 		if node.posy == g.maze.length-1
-			correctRoute(node, q)
+			correctRoute(node, q, g)
 			foundEnd = true
 		elsif endPath(g, node)
-			dacPath(node, q)
+			dacPath(node, q, g)
 			foundEnd = false
 		end
 
 		return foundEnd
 	end
 
-	def dacPath(node, q)
-		until not node or q.include?(node)
+	def dacPath(node, q, g)
+		until node == nil or checkActive(node, g)
 			node.color = "G"
 			node = node.parent
 		end
 	end
 
-	def correctRoute(node, q)
+	def correctRoute(node, q, g)
 		q.each do |n|
-			dacPath(n, q)
+			dacPath(n, q, g)
 			n.color = "G"
 		end
 		(node.dist+1).times do 
@@ -105,6 +112,19 @@ class Solver
 		end
 	end
 
+	def checkActive(node, g)
+		t = 0
+		g.edges["#{node.posx},#{node.posy}".to_sym].each do |n|
+			if g.vertexs["#{n[0]},#{n[1]}".to_sym].color != "G"
+				t += 1
+			end
+		end
+		if t > 1
+			return true
+		else  
+			return false
+		end
+	end
 
 	def endPath(g, node)
 		if g.edges["#{node.posx},#{node.posy}".to_sym].count == 1 && node.posy != 0
