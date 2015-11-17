@@ -117,27 +117,25 @@ class MazeUI < Qt::Widget
 	def solve()
 		#find the entrance
 		@graph = Graph.new(@maze)
-		puts @graph
-		p @graph.vertexs.keys
-		p @graph.vertexs.values
-		p @graph.edges.keys
-		p @graph.edges.values
 
-		#for i in 1...@maze[0].length
-		#	if @maze[0][i] == " " or @maze[0][i] == "b"
-		#		s = :"#{i},#{0}"
-		#		break
-		#	end
-		#end
-#
-		#if @bFS.checked == true
-		#	@solver.bFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
-		#else
-		#	@solver.dFS(@maze, @solver.nodeMap(@maze), s) {delay(@delay.value.to_f)}
-		#end
+		for i in 1...@maze[0].length
+			if @maze[0][i] == " " or @maze[0][i] == "b"
+				s = @graph.vertexs["#{i},#{0}".to_sym]
+				break
+			end
+		end
+
+		if @bFS.checked == true
+			@solver.bFS(@graph, s) {|graph| delay(@delay.value.to_f, graph)}
+		else
+			@solver.dFS(@graph, s) {|graph| delay(@delay.value.to_f, graph)}
+		end
 	end
 
-	def delay(time)
+	def delay(time, graph)
+		graph.vertexs.values.each do |node|
+		 	@maze[node.posy][node.posx] = node.color
+		end
 		@mazeWin.repaint()
 		sleep(time)
 	end

@@ -1,6 +1,5 @@
-SGraph = Struct.new(:vertexs,:edges)
-Node = Struct.new(:posx, :posy, :dist, :parent)
-Pos = Struct.new(:x,:y)
+SGraph = Struct.new(:vertexs,:edges, :maze)
+Node = Struct.new(:posx, :posy, :dist, :color, :parent)
 
 N = [0,1]
 S = [0,-1]
@@ -8,7 +7,7 @@ E = [1,0]
 W = [-1,0]
 
 class Graph
-	attr_reader :vertexs, :edges
+	attr_reader :vertexs, :edges, :maze
 	def initialize(maze)
 		@graph = SGraph.new(makeVertexs(maze),makeEdges(maze))
 		@vertexs = @graph.vertexs
@@ -20,7 +19,7 @@ class Graph
 		for y in (0...maze.length)
 			for x in (0...maze[0].length)
 				if maze[y][x] == " "
-					vertexs["#{x},#{y}".to_sym] = Node.new(x, y, 0, nil)
+					vertexs["#{x},#{y}".to_sym] = Node.new(x, y, 0, " ", nil)
 				end
 			end
 		end
