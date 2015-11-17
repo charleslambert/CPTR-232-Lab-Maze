@@ -1,10 +1,3 @@
-#Node = Struct.new(:posx, :posy, :dist, :parent)
-#
-#N = [0,1]
-#S = [0,-1]
-#E = [1,0]
-#W = [-1,0]
-
 class Solver
 
 	def dFS(g, s)
@@ -36,12 +29,15 @@ class Solver
 			end
 			# u color set to Black
 			u.color = "b"
+			nowEnd = checkEnd(g, u, q)
 			yield g
+
+			if nowEnd
+				break
+			end
 		end
-		return u
 	end
 
-	
 	def bFS(g, s)
 		#set begining vertex s
 		s.color = "g"
@@ -68,16 +64,59 @@ class Solver
 					yield g
 				end
 			end
-			# u color set to Black
+			# u color set to Blue
 			u.color = "b"
+			nowEnd = checkEnd(g, u, q.que)
 			yield g
+
+			if nowEnd
+				break
+			end
 		end
-		return u
 	end
 
+	def checkEnd(g, node, q)
+		if node.posy == g.maze.length-1
+			correctRoute(node, q)
+			foundEnd = true
+		elsif endPath(g, node)
+			dacPath(node, q)
+			foundEnd = false
+		end
+
+		return foundEnd
+	end
+
+	def dacPath(node, q)
+		until not node or q.include?(node)
+			node.color = "G"
+			node = node.parent
+		end
+	end
+
+	def correctRoute(node, q)
+		q.each do |n|
+			dacPath(n, q)
+			n.color = "G"
+		end
+		(node.dist+1).times do 
+			node.color = "r"
+			node = node.parent
+		end
+	end
+
+
+	def endPath(g, node)
+		if g.edges["#{node.posx},#{node.posy}".to_sym].count == 1 && node.posy != 0
+			return true
+		else
+			return false
+		end
+	end
 end
 
 class Queue
+	attr_reader :que
 	def initialize
 		@que =[]
 	end

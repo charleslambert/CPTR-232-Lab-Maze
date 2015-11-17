@@ -45,6 +45,9 @@ class MazeWindow < Qt::Widget
             when "G"
               painter.setBrush Qt::Brush.new(Qt::gray)
               painter.drawRect(j*@scale,i*@scale,@scale,@scale)
+            when "r"
+              painter.setBrush Qt::Brush.new(Qt::red)
+              painter.drawRect(j*@scale,i*@scale,@scale,@scale)
             end
           end
         end

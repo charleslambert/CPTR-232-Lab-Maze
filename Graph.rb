@@ -9,9 +9,10 @@ W = [-1,0]
 class Graph
 	attr_reader :vertexs, :edges, :maze
 	def initialize(maze)
-		@graph = SGraph.new(makeVertexs(maze),makeEdges(maze))
+		@graph = SGraph.new(makeVertexs(maze),makeEdges(maze), maze)
 		@vertexs = @graph.vertexs
 		@edges = @graph.edges
+		@maze = maze
 	end
 
 	def makeVertexs(maze)
