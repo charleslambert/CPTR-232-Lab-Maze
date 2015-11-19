@@ -5,7 +5,7 @@ require_relative "MazeWindow.rb"
 
 class MazeUI < Qt::Widget
 
-	slots('fileRead()','primms()','backtrack()','oldest()','fileWrite()', 'solve()', 'updateDelay()')
+	slots('fileRead()','primms()','backtrack()','oldest()','fileWrite()', 'solve()', 'updateDelay()', 'reRun()')
 
 	def initialize
 		super
@@ -124,21 +124,25 @@ class MazeUI < Qt::Widget
 		connect(@rMaze, SIGNAL('clicked()'), self, SLOT(:solve))
 		connect(@dSlider, SIGNAL('valueChanged(int)'), self, SLOT(:updateDelay))
 		connect(@dSlider, SIGNAL('valueChanged(int)'), @dDelay, SLOT('display(int)'))
+		connect(@rrMaze, SIGNAL('clicked()'), self, SLOT(:reRun))
 	end
 
 	def primms
 		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Primms")
 		@mazeWin.setMaze(@maze.m)
+		@rrMaze.enabled = false
 	end
 
 	def oldest
 		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Oldest")
 		@mazeWin.setMaze(@maze.m)
+		@rrMaze.enabled = false
 	end
 
 	def backtrack
 		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Backtrack")
 		@mazeWin.setMaze(@maze.m)
+		@rrMaze.enabled = false
 	end
 
 	def solve
@@ -147,6 +151,11 @@ class MazeUI < Qt::Widget
 		else	
 			@mazeWin.solve(:dFS,@maze)
 		end
+		@rrMaze.enabled = true
+	end
+
+	def reRun
+		@mazeWin.correctPath
 	end
 
 	def updateDelay
@@ -160,6 +169,7 @@ class MazeUI < Qt::Widget
 			@mazeWin.maze = @maze.m
 			file.close
 		end
+		@rrMaze.enabled = false
 	end
 
 	def fileWrite

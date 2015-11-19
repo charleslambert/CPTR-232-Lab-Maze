@@ -88,6 +88,11 @@ class MazeWindow < Qt::Widget
 		@timer.start
 	end
 
+	def correctPath
+		@graph.highlightCP
+		paintGraph
+	end
+
 	def onTimeout
 		begin
 			@searchTime.resume

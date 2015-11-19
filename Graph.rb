@@ -210,6 +210,14 @@ class Graph
 			return false
 		end
 	end
+
+	def highlightCP
+		self.vertexs.values.each { |node|
+			if node.color != "r"
+				node.color = " "
+			end
+		}
+	end
 end
 
 class Queue
