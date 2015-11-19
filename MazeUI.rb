@@ -1,14 +1,11 @@
-#!/usr/bin/env ruby
-
-require_relative "MyWidgets.rb"
-require_relative "MazeGenerator.rb"
-require_relative "Searches.rb"
-require_relative "Graph.rb"
 require 'Qt'
+require_relative "extraWidgets.rb"
+require_relative "Maze.rb"
+require_relative "MazeWindow.rb"
 
 class MazeUI < Qt::Widget
 
-	slots('fileRead()','primms()','backtrack()','oldest()','writeFile()', 'solve()','onTimeout()', 'updateDelay()')
+	slots('fileRead()','primms()','backtrack()','oldest()','fileWrite()', 'solve()', 'updateDelay()')
 
 	def initialize
 		super
@@ -24,14 +21,18 @@ class MazeUI < Qt::Widget
 	end
 
 	def initUI
+		objects
 		widgets
 		layout
-		@generator = MazeGenerator.new
-		@solver = Solver.new
-		@timer = Qt::Timer.new
+	end
+
+	def objects
+		@maze = Maze.new
 	end
 
 	def widgets
+		@mazeWin = MazeWindow.new
+
 		#Maze generation buttons and text boxes
 		@wGen = MyValueBox.new("Width:")
 		@hGen = MyValueBox.new("Height:")
@@ -72,7 +73,6 @@ class MazeUI < Qt::Widget
 			i.addButton(@bFS)
 			i.addButton(@dFS)
 		end
-		@mazeWin = MazeWindow.new
 	end
 
 	def layout
@@ -106,8 +106,6 @@ class MazeUI < Qt::Widget
 			i.addWidget(@dFS)
 		end
 
-	
-
 		Qt::VBoxLayout.new(self) do |i|
 			i.addLayout(mazeGen)
 			i.addLayout(mazeRead)
@@ -119,113 +117,55 @@ class MazeUI < Qt::Widget
 
 	def connections
 		connect(@import, SIGNAL('clicked()'), self, SLOT(:fileRead))
-		connect(@export, SIGNAL('clicked()'), self, SLOT(:writeFile))
+		connect(@export, SIGNAL('clicked()'), self, SLOT(:fileWrite))
 		connect(@primms, SIGNAL('triggered()'), self, SLOT(:primms))
 		connect(@oldest, SIGNAL('triggered()'), self, SLOT(:oldest))
 		connect(@backTrack, SIGNAL('triggered()'), self, SLOT(:backtrack))
 		connect(@rMaze, SIGNAL('clicked()'), self, SLOT(:solve))
-		connect(@timer, SIGNAL('timeout()'), self, SLOT(:onTimeout))
 		connect(@dSlider, SIGNAL('valueChanged(int)'), self, SLOT(:updateDelay))
 		connect(@dSlider, SIGNAL('valueChanged(int)'), @dDelay, SLOT('display(int)'))
 	end
 
-	def solve()
-		#find the entrance
-		for y in 0...@maze.length
-			for x in 0...@maze[0].length
-				if @maze[y][x] != "w"
-					@maze[y][x] = " "
-				end
-			end
-		end
-
-		for i in 1...@maze[0].length
-			if @maze[0][i] == " " or @maze[0][i] == "b"
-				s = @graph.vertexs["#{i},#{0}".to_sym]
-				break
-			end
-		end
-
-		@searchTime = Fiber.new {
-			if @bFS.checked == true
-				@solver.bFS(@graph, s) {|graph| 
-					updateWin(@graph)
-					Fiber.yield
-				}
-			else
-				@solver.dFS(@graph, s) {|graph| 
-					updateWin(@graph)
-					Fiber.yield
-				}
-			end
-		}
-		@timer.start
+	def primms
+		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Primms")
+		@mazeWin.setMaze(@maze.m)
 	end
 
-	def updateWin(graph)
-		graph.vertexs.values.each do |node|
-		 	@maze[node.posy][node.posx] = node.color
-		end
-		@mazeWin.repaint()
+	def oldest
+		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Oldest")
+		@mazeWin.setMaze(@maze.m)
 	end
 
-	def onTimeout
-		begin
-		@searchTime.resume  
-		rescue FiberError
-			@timer.stop
+	def backtrack
+		@maze.generate(@wGen.value.to_i, @hGen.value.to_i, "Backtrack")
+		@mazeWin.setMaze(@maze.m)
+	end
+
+	def solve
+		if 	@bFS.checked == true	
+			@mazeWin.solve(:bFS,@maze)
+		else	
+			@mazeWin.solve(:dFS,@maze)
 		end
 	end
 
 	def updateDelay
-		@timer.interval = @dSlider.value
+		@mazeWin.setDelay(@dSlider.value)
 	end
 
-	def generate(x, y, type)
-		if not (x <= 4) and not (y <= 4)
-			if x > 80 
-				x = 80
-			end
-			if y > 80
-				y = 80
-			end
-			@generator.generate(x, y, type)
-			@maze = @generator.grid
-			@mazeWin.maze = @maze
-			@graph = Graph.new(@maze)
-		end
-	end
-
-	def primms()
-		generate(@wGen.value.to_i, @hGen.value.to_i, "Primms")
-	end
-
-	def oldest()
-		generate(@wGen.value.to_i, @hGen.value.to_i, "Oldest")
-	end
-
-	def backtrack()
-		generate(@wGen.value.to_i, @hGen.value.to_i, "Backtrack")
-	end
-
-	def fileRead()
-		if @file.value != ""
-			@maze = []
+	def fileRead
+		if File.file?(@file.value)
 			file = File.open("#{@file.value}", 'r')
-			file.each_line {|line|
-				@maze << line.chomp.split("")}
+			@maze.set_m(file.read)
+			@mazeWin.maze = @maze.m
 			file.close
-			@mazeWin.maze = @maze
-			@graph = Graph.new(@maze)
 		end
 	end
 
-	def writeFile()
+	def fileWrite
 		if @file.value != ""
-			puts @file.value
-			puts "\n"
 			fp = File.open(@file.value, "w")
-			fp.puts @mazeWin.maze.map {|row| row.join("")}
+			fp.puts @maze.to_s(@maze.m)
 			fp.close
 		end
 	end

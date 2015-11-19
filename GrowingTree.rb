@@ -5,15 +5,16 @@ OPP1	   = {:N => :NW, :S => :SW, :E => :SE, :W => :SW}
 OPP2	   = {:N => :NE, :S => :SE, :E => :NE, :W => :NW}
 
 class GrowingTree
-	attr_accessor :grid
+	attr_accessor :maze
 
 	def initialize(width, height, type)
 		#create grid of unvisited cells
-		@grid = Array.new(height) {Array.new(width) {"?"}}
+		@maze = Array.new(height) {Array.new(width) {"?"}}
 		@type = type
 
 		run(width, height, type)
 		setWall(width, height)
+		addOpening(width, height)
 	end
 
 	def run(width, height, type)
@@ -32,10 +33,10 @@ class GrowingTree
  			[:N,:S,:E,:W].shuffle.each do |dir|
  				dx, dy = x+DX[dir], y+DY[dir]
 
- 				if dx.between?(1,width-2) && dy.between?(1,height-2) && @grid[dy][dx] == "?" && check(dir, dx, dy)
+ 				if dx.between?(1,width-2) && dy.between?(1,height-2) && @maze[dy][dx] == "?" && check(dir, dx, dy)
  					#if neighbor is not visited add to active set
- 					@grid[y][x] = " "
- 					@grid[dy][dx] = " "
+ 					@maze[y][x] = " "
+ 					@maze[dy][dx] = " "
  					cells << [dx,dy]
  					index = nil
 					break
@@ -68,7 +69,7 @@ class GrowingTree
 		[:N,:S,:E,:W,:NE,:NW,:SW,:SE].each {|d| 
 			if d != OPPOSITE[dir] &&  d != OPP1[OPPOSITE[dir]] && d != OPP2[OPPOSITE[dir]]
 				dx, dy = x+DX[d],y+DY[d]
-				if @grid[dy][dx] == "?"
+				if @maze[dy][dx] == "?"
 					status << true
 				else
 					status << false
@@ -86,10 +87,30 @@ class GrowingTree
 		#replace unvisited cells with walls
 	 	for y in 0...height
 	 		for x in 0...width
-	 			if @grid[y][x] == "?"
-	 				@grid[y][x] = "w"
+	 			if @maze[y][x] == "?"
+	 				@maze[y][x] = "w"
 	 			end
 	 		end
 	 	end
 	end
+
+	def addOpening(width, height)
+		a = []
+		for i in (0..width-1)
+			if @maze[1][i] == " "
+				a << i
+			end
+		end
+		@maze[0][a.sample] = " "
+
+		a = []
+		for i in (0..width-1)
+			if @maze[height-2][i] == " "
+				a << i
+			end
+		end
+		@maze[height-1][a.sample] = " "
+	end
+
+
 end
